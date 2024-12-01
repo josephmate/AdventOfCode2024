@@ -16,7 +16,21 @@ defmodule AdventOfCode.Day01 do
   end
 
   def part1(input) do
-    0
+    input
+    |> String.split("\n")
+    |> Stream.each(&IO.inspect/1)
+    |> Stream.map(&String.graphemes()/1)
+    |> Stream.each(&IO.inspect/1)
+    |> Stream.map(fn chars ->
+      chars
+      |> Stream.filter(&(&1 >= "1" and &1 <= "9"))
+      |> Stream.map(&String.to_integer()/1)
+      |> Enum.to_list()
+      end)
+    |> Stream.each(&IO.inspect/1)
+    |> Stream.map(fn digits -> hd(digits)*10 + List.last(digits) end)
+    |> Stream.each(&IO.inspect/1)
+    |> Enum.sum()
   end
 
   def part2(input) do
