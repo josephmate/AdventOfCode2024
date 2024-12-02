@@ -34,12 +34,13 @@ defmodule AdventOfCode do
   defp run_day(day, part, type) do
     # Dynamically load the day's module
     module = Module.concat(AdventOfCode, "Day#{day}")
+    dynamic = struct(module)
 
     if type == :sample do
       # Get sample files based on part
       sample_files = case part do
-        1 -> apply(module, :sample_part1_files, [])
-        2 -> apply(module, :sample_part2_files, [])
+        1 -> AdventOfCode.DaySolution.sample_part1_files(dynamic)
+        2 -> AdventOfCode.DaySolution.sample_part2_files(dynamic)
       end
 
       # Run each sample file

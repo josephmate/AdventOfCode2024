@@ -1,35 +1,38 @@
 defmodule AdventOfCode.Day01 do
-  @behaviour AdventOfCode.DaySolution
+  defstruct  day: "01"
 
-  @impl AdventOfCode.DaySolution
-  def sample_part1_files do
-    %{
-      "day01_sample01_part01.txt" => "day01_sample01_part01_result.txt",
-    }
+  defimpl AdventOfCode.DaySolution do
+    def sample_part1_files(value) do
+      %{
+        "day#{value.day}_sample.txt" => "day#{value.day}_sample_part1_result.txt"
+      }
+    end
+
+    @fallback_to_any true
+    def sample_part2_files(value) do
+      day_num = AdventOfCode.DaySolution.day(value)
+      %{
+        "day#{value.day}_sample.txt" => "day#{value.day}_sample_part1_result.txt"
+      }
+    end
   end
 
-  @impl AdventOfCode.DaySolution
-  def sample_part2_files do
-    %{
-      "day01_sample01_part02.txt" => "day01_sample01_part02_result.txt",
-    }
-  end
-
+    # |> Stream.each(&IO.inspect/1)
   def part1(input) do
-    input
+    {first_list, second_list} = input
     |> String.split("\n")
-    |> Stream.each(&IO.inspect/1)
-    |> Stream.map(&String.graphemes()/1)
-    |> Stream.each(&IO.inspect/1)
-    |> Stream.map(fn chars ->
-      chars
-      |> Stream.filter(&(&1 >= "1" and &1 <= "9"))
-      |> Stream.map(&String.to_integer()/1)
-      |> Enum.to_list()
-      end)
-    |> Stream.each(&IO.inspect/1)
-    |> Stream.map(fn digits -> hd(digits)*10 + List.last(digits) end)
-    |> Stream.each(&IO.inspect/1)
+    |> Stream.map(&String.split()/1)
+    |> Stream.map(&List.to_tuple()/1)
+    |> Stream.map(fn {a, b} -> {String.to_integer(a), String.to_integer(b)} end)
+    |> Enum.to_list()
+    |> Enum.unzip()
+
+    first_list = Enum.sort(first_list)
+    second_list = Enum.sort(second_list)
+
+    Stream.zip([first_list, second_list])
+    |> Stream.map(fn {a,b} -> abs(a-b) end)
+    |> Enum.to_list()
     |> Enum.sum()
   end
 
