@@ -8,7 +8,6 @@ defmodule AdventOfCode.Day01 do
       }
     end
 
-    @fallback_to_any true
     def sample_part2_files(value) do
       %{
         "day#{value.day}_sample.txt" => "day#{value.day}_sample_part2_result.txt"
