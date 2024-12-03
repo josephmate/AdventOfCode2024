@@ -21,31 +21,8 @@ defmodule AdventOfCode.Day02 do
     input
     |> String.split("\n")
     |> Stream.map(&String.split()/1)
-    |> Stream.each(&IO.inspect/1)
     |> Stream.map(fn row -> Enum.map(row, &String.to_integer()/1) end)
-    |> Stream.each(&IO.inspect/1)
-    |> Stream.map(
-      fn row ->
-        Enum.zip(row, tl(row))
-        |> Enum.map(fn {a,b} -> a - b end)
-      end)
-    |> Stream.each(&IO.inspect/1)
-    |> Stream.filter(
-      fn row ->
-        is_increasing = hd(row) >= 1
-        Enum.map(row, &(
-          &1 >= -3
-          and &1 <= 3
-          and &1 != 0
-          and (
-            (is_increasing and &1 > 0)
-            or (!is_increasing and &1 < 0)
-            )
-          ))
-        |> IO.inspect()
-        |> Enum.all?(&(&1))
-      end
-    )
+    |> Stream.filter(&is_safe?/1)
     |> Enum.count()
   end
 
@@ -54,25 +31,38 @@ defmodule AdventOfCode.Day02 do
     |> String.split("\n")
     |> Stream.map(&String.split()/1)
     |> Stream.map(fn row -> Enum.map(row, &String.to_integer()/1) end)
-    |> Stream.map(
-      fn row ->
-        Enum.zip(row, tl(row))
-        |> Enum.map(fn {a,b} -> a - b end)
-      end)
-    |> Stream.filter(
-      fn row ->
-        is_increasing = hd(row) >= 1
-        1 >= (row
-        |> Enum.map(fn val ->
-          (is_increasing and (val < 1 or val > 3))
-          or (!is_increasing and (val > -1 or val < -3))
-          end)
-        |> IO.inspect()
-        |> Enum.filter(&(&1))
-        |> Enum.count())
-      end
-    )
+    |> Stream.filter(&is_safe_with_dampener?/1)
     |> Enum.count()
   end
 
+  defp is_safe?(row) do
+    deltas = Enum.zip(row, tl(row))
+    |> Enum.map(fn {a,b} -> a - b end)
+
+    are_deltas_safe?(deltas)
+  end
+
+  defp are_deltas_safe?(deltas) do
+    is_increasing = hd(deltas) >= 1
+    Enum.map(deltas, &(
+      &1 >= -3
+      and &1 <= 3
+      and &1 != 0
+      and (
+        (is_increasing and &1 > 0)
+        or (!is_increasing and &1 < 0)
+        )
+      ))
+    |> Enum.all?(&(&1))
+  end
+
+  defp is_safe_with_dampener?(row) do
+    IO.inspect(row)
+    0..length(row)
+    |> Stream.map(fn idx -> List.delete_at(row, idx) end)
+    |> Stream.each(&IO.inspect()/1)
+    |> Stream.filter(&is_safe?/1)
+    |> Enum.count()
+    >= 1
+  end
 end
