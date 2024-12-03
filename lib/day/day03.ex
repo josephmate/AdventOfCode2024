@@ -10,7 +10,7 @@ defmodule AdventOfCode.Day03 do
 
     def sample_part2_files(value) do
       %{
-        "day#{value.day}_sample.txt" => "day#{value.day}_sample_part2_result.txt"
+        "day#{value.day}_sample_part2.txt" => "day#{value.day}_sample_part2_result.txt"
       }
     end
   end
@@ -30,9 +30,29 @@ defmodule AdventOfCode.Day03 do
   end
 
   def part2(input) do
-    input
-    |> String.split("\n")
-    |> Stream.map(&String.split()/1)
+    regex = ~r/(mul\((\d+),(\d+)\))|(do\(\))|(don't\(\))/
+    Regex.scan(regex, input)
+    |> IO.inspect()
+    |> Enum.reduce([true, 0], &reducer/2)
+    |> Kernel.then(fn [_doit, acc] -> acc end)
   end
 
+  defp reducer(match, [doit, acc]) do
+    case match do
+      ["mul" <> _, _, a, b] ->
+        if doit do
+          [doit, acc + String.to_integer(a) * String.to_integer(b)]
+        else
+          [doit, acc]
+        end
+
+
+      ["don't()" | _tail] ->
+        [false, acc]
+
+      ["do()" | _tail] ->
+        [true, acc]
+
+    end
+  end
 end
