@@ -65,11 +65,78 @@ defmodule AdventOfCode.Day04 do
   end
 
   def part2(input) do
-    input
+    wordsearch = input
     |> String.split("\n")
-    |> Stream.map(&String.split()/1)
-    |> Stream.map(fn row -> Enum.map(row, &String.to_integer()/1) end)
-    |> Enum.count()
+    |> Stream.map(&String.to_charlist/1)
+    |> Stream.map(&List.to_tuple/1)
+    |> Enum.to_list()
+    |> List.to_tuple()
+    |> IO.inspect()
+
+    num_rows = tuple_size(wordsearch)
+    num_cols = tuple_size(elem(wordsearch,0))
+    for i <- 0..(num_rows-1) do
+      for j <- 0..(num_cols-1) do
+        if    i - 1 >= 0
+          and i + 1 < num_rows
+          and j - 1 >= 0
+          and j + 1 < num_cols
+          and index(wordsearch, i, j) == ?A
+        do
+          if (
+            # Case 1 of 4
+            # M S
+            #  A
+            # M S
+            index(wordsearch, i-1, j-1) == ?M
+            and index(wordsearch, i+1, j-1) == ?M
+            and index(wordsearch, i+1, j+1) == ?S
+            and index(wordsearch, i-1, j+1) == ?S
+            )
+            # Case 2 of 4
+            # S S
+            #  A
+            # M M
+            or (
+            index(wordsearch, i-1, j-1)     == ?S
+            and index(wordsearch, i+1, j-1) == ?M
+            and index(wordsearch, i+1, j+1) == ?M
+            and index(wordsearch, i-1, j+1) == ?S
+            )
+            # Case 3 of 4
+            # M M
+            #  A
+            # S S
+            or (
+            index(wordsearch, i-1, j-1)     == ?M
+            and index(wordsearch, i+1, j-1) == ?S
+            and index(wordsearch, i+1, j+1) == ?S
+            and index(wordsearch, i-1, j+1) == ?M
+            )
+            # Case 4 of 4
+            # S M
+            #  A
+            # S M
+            or (
+            index(wordsearch, i-1, j-1)     == ?S
+            and index(wordsearch, i+1, j-1) == ?S
+            and index(wordsearch, i+1, j+1) == ?M
+            and index(wordsearch, i-1, j+1) == ?M
+            )
+          do
+            1
+          else
+            0
+          end
+
+        else
+          0
+        end
+      end
+      |> Enum.sum()
+    end
+    |> Enum.sum()
+
   end
 
 end
