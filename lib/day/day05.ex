@@ -82,20 +82,20 @@ defmodule AdventOfCode.Day05 do
   end
 
   defp _total_order(page_order_before_to_after) do
-    all_nums = page_order_before_to_after
+    _all_nums = page_order_before_to_after
     |> Stream.map(&Tuple.to_list/1)
     |> Enum.to_list()
     |> List.flatten()
     |> MapSet.new()
     |> IO.inspect()
 
-    all_befores = page_order_before_to_after
+    _all_befores = page_order_before_to_after
     |> Stream.map(fn {before, _after} -> before end)
     |> Enum.to_list()
     |> MapSet.new()
     |> IO.inspect()
 
-    all_afters = page_order_before_to_after
+    _all_afters = page_order_before_to_after
     |> Stream.map(fn {_before, aafter} -> aafter end)
     |> Enum.to_list()
     |> MapSet.new()
