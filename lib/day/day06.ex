@@ -35,10 +35,6 @@ defmodule AdventOfCode.Day06 do
 
   defp solve_p1(lab_map) do
     {visited_posns, _} = solve(lab_map, {-123, -123})
-
-    num_rows = tuple_size(lab_map)
-    num_cols = tuple_size(elem(lab_map, 0))
-
     MapSet.size(visited_posns)
   end
 
