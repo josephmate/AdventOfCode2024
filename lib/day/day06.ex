@@ -17,15 +17,16 @@ defmodule AdventOfCode.Day06 do
 
     # |> Stream.each(&IO.inspect/1)
   def part1(input) do
-    lab_map = input
+    lab_map = parse_input(input)
+    solve_p1(lab_map)
+  end
+
+  defp parse_input(input) do
+    input
     |> String.split("\n")
     |> Enum.map(&String.to_charlist()/1)
     |> Enum.map(&List.to_tuple()/1)
     |> List.to_tuple()
-    |> IO.inspect()
-
-
-    solve_p1(lab_map)
   end
 
   def index(arr, row, col) do
@@ -37,19 +38,6 @@ defmodule AdventOfCode.Day06 do
 
     num_rows = tuple_size(lab_map)
     num_cols = tuple_size(elem(lab_map, 0))
-    IO.puts(
-      for r <- 0..num_rows-1 do
-        for c <- 0..num_cols-1 do
-          if MapSet.member?(visited_posns, {r,c}) do
-            "X"
-          else
-            <<index(lab_map, r, c)::utf8>>
-          end
-        end
-        |> Enum.join("")
-      end
-      |> Enum.join("\n")
-    )
 
     MapSet.size(visited_posns)
   end
@@ -65,7 +53,6 @@ defmodule AdventOfCode.Day06 do
         end
       end
       |> List.flatten()
-      |> IO.inspect()
 
     visited_posns = MapSet.new()
     turn_points = MapSet.new()
@@ -127,10 +114,24 @@ defmodule AdventOfCode.Day06 do
   end
 
   def part2(input) do
-    input
-    |> String.split("\n")
+    lab_map = parse_input(input)
 
-    0
+    num_rows = tuple_size(lab_map)
+    num_cols = tuple_size(elem(lab_map, 0))
+
+    for r <- 0..num_rows-1 do
+      for c <- 0..num_cols-1, index(lab_map, r, c) != ?^ do
+        IO.puts("#{r}, #{c}")
+        {_, is_cyclical?} = solve(lab_map, {r,c})
+        if is_cyclical? do
+          1
+        else
+          0
+        end
+      end
+      |> Enum.sum()
+    end
+    |> Enum.sum()
   end
 
 end
