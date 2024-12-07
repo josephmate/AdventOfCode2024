@@ -59,9 +59,32 @@ defmodule AdventOfCode.Day07 do
 
 
   def part2(input) do
-    input
-    |> String.split("\n")
-    0
+    problem = parse_input(input)
+
+    problem
+    |> Enum.filter(&is_equal_p2?/1)
+    |> Enum.map(fn {expected, _} -> expected end)
+    |> Enum.sum()
+  end
+
+  defp is_equal_p2?({expected, values}) do
+    len = tuple_size(values)
+    is_equal_p2_impl?(expected, values, len, elem(values, 0), 1)
+  end
+
+  defp is_equal_p2_impl?(expected, values, len, acc, posn) do
+    if posn == len do
+      expected == acc
+    else
+      curr = elem(values, posn)
+      is_equal_p2_impl?(expected, values, len, acc*curr, posn+1)
+      or is_equal_p2_impl?(expected, values, len, acc+curr, posn+1)
+      or is_equal_p2_impl?(expected, values, len, concat(acc,curr), posn+1)
+    end
+  end
+
+  defp concat(a,b) do
+      String.to_integer(Integer.to_string(a) <> Integer.to_string(b))
   end
 
 end
