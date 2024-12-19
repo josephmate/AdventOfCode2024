@@ -94,7 +94,68 @@ defmodule AdventOfCode.Day18 do
   end
 
   def part2(_input) do
+    IO.puts("expected")
+    IO.puts("6,1")
+    IO.puts("actual")
+    solve_part2(
+      Path.join([File.cwd!(), "inputs", "day18_sample.txt"])
+      |> File.read!(),
+      6
+    )
+    |> IO.inspect()
+
+    IO.puts("real")
+    solve_part2(
+      Path.join([File.cwd!(), "inputs", "day18.txt"])
+      |> File.read!(),
+      70
+    )
+    |> IO.inspect()
+
     0
+  end
+
+  def solve_part2(input, max_val) do
+    posns = input
+    |> String.split("\n")
+    |> Enum.map(fn line -> String.split(line, ",") end)
+    |> Enum.map(fn [x, y] -> {String.to_integer(x), String.to_integer(y)} end)
+
+    lastGoodPoint = find_first_blocker(posns, max_val, 0, length(posns)-1, nil)
+    Enum.at(posns, lastGoodPoint + 1)
+  end
+
+  def find_first_blocker(posns, max_val, startRange, endRange, lastGoodPoint) do
+    if (startRange > endRange) do
+      lastGoodPoint
+    else
+      # 0
+      # ^
+      # 0 1
+      # ^
+      # 0 1 2
+      #   ^
+      # 0 1 2 3
+      #   ^
+      # 0 1 2 3 4
+      #     ^
+      midPoint = div(startRange + endRange, 2)
+      memory_map = to_map(Enum.slice(posns, 0, midPoint+1))
+      path_len = find_shortest_path_len(memory_map, max_val, {0,0}, {max_val, max_val})
+      if path_len == nil do
+        find_first_blocker(posns, max_val, startRange, midPoint-1, lastGoodPoint)
+      else
+        lastGoodPoint = midPoint
+        find_first_blocker(posns, max_val, midPoint+1, endRange, lastGoodPoint)
+      end
+    end
+  end
+
+  def to_map(posns) do
+    posns
+    |> Enum.reduce(%{}, fn {x, y}, acc ->
+      Map.put(acc, {x, y}, ?#)
+    end)
   end
 
 end
