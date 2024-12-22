@@ -38,6 +38,9 @@ defmodule AdventOfCode.Day20 do
     Path.join([File.cwd!(), "inputs", "day20.txt"])
     |> File.read!()
     |> solve_part1()
+    |> Enum.filter(fn {_, v} -> v >= 100 end)
+    |> Enum.map(fn {_, v} -> v end)
+    |> Enum.sum()
     |> IO.inspect()
 
     0
@@ -60,9 +63,41 @@ defmodule AdventOfCode.Day20 do
     |> Enum.filter(fn {{_,_},val} -> val == ?E end)
     |> Enum.map(fn {{r,c},_} -> {r,c} end)
 
-    no_cheat_path = map
+    no_cheat_path_map = map
     |> bfs(start_posn, end_posn)
-    |> IO.inspect()
+    |> Enum.reduce(%{}, fn {r,c,numMoves}, acc ->
+      Map.put(acc, {r,c}, numMoves)
+    end)
+
+    no_cheat_path_map
+    |> Enum.map(fn {{r,c}, numMoves} ->
+      [
+        {r + 0, c + 2, numMoves + 2},
+        {r + 0, c - 2, numMoves + 2},
+        {r + 1, c + 1, numMoves + 2},
+        {r + 1, c - 1, numMoves + 2},
+        {r - 1, c + 1, numMoves + 2},
+        {r - 1, c - 1, numMoves + 2},
+        {r + 2, c + 0, numMoves + 2},
+        {r - 2, c + 0, numMoves + 2},
+      ]
+    end)
+    |> List.flatten()
+    |> Enum.filter(fn {r,c, _} ->
+      Map.has_key?(no_cheat_path_map, {r,c})
+    end)
+    |> Enum.filter(fn {r,c, numMoves} ->
+      numMoves < Map.get(no_cheat_path_map, {r,c})
+    end)
+    |> Enum.map(fn {r,c,numMoves} ->
+      {r,c, Map.get(no_cheat_path_map, {r,c}) - numMoves}
+    end)
+    |> Enum.group_by(
+      fn {_,_, numMoves} -> numMoves end,
+      fn {r,c, _} -> {r,c} end
+    )
+    |> Enum.map(fn {k, v} -> {k, length(v)} end)
+
   end
 
   def bfs(map, {r,c}, end_posn) do
@@ -71,14 +106,10 @@ defmodule AdventOfCode.Day20 do
     visited = %{}
     visited = Map.put(visited, {r,c}, 0)
     bfs_impl(map, end_posn, queue, visited)
+
   end
 
   def bfs_impl(map, end_posn, queue, visited) do
-    IO.puts("bfs_impl")
-    IO.puts("queue")
-    IO.inspect(queue)
-    IO.puts("visited")
-    IO.inspect(visited)
     if :queue.is_empty(queue) do
       # no moves left
       # expected to read the end
@@ -89,15 +120,6 @@ defmodule AdventOfCode.Day20 do
         path
         |> Enum.reverse()
       else
-        IO.puts("inspecting move")
-        IO.write("!Map.has_key?(map, {r,c}) ")
-        IO.inspect(!Map.has_key?(map, {r,c}))
-        IO.write("<<Map.get(map, {r,c})>> ")
-        IO.inspect(<<Map.get(map, {r,c})>>)
-        IO.write("numMoves ")
-        IO.inspect(numMoves)
-        IO.write("Map.get(visited, {r,c}, 99999999999) ")
-        IO.inspect(Map.get(visited, {r,c}, 99999999999))
         visited = Map.put(visited, {r,c}, numMoves)
         moves = [
           {r + 0, c + 1, numMoves + 1, [{r + 0, c + 1, numMoves + 1} | path]},
