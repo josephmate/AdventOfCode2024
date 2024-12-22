@@ -34,11 +34,11 @@ defmodule AdventOfCode.Day20 do
     |> solve_part1()
     |> IO.inspect()
 
-    #IO.puts("real")
-    #Path.join([File.cwd!(), "inputs", "day20.txt"])
-    #|> File.read!()
-    #|> solve_part1()
-    #|> IO.inspect()
+    IO.puts("real")
+    Path.join([File.cwd!(), "inputs", "day20.txt"])
+    |> File.read!()
+    |> solve_part1()
+    |> IO.inspect()
 
     0
   end
@@ -67,7 +67,7 @@ defmodule AdventOfCode.Day20 do
 
   def bfs(map, {r,c}, end_posn) do
     queue = :queue.new()
-    queue = :queue.in({r,c , 0, []}, queue)
+    queue = :queue.in({r,c , 0, [{r,c,0}]}, queue)
     visited = %{}
     visited = Map.put(visited, {r,c}, 0)
     bfs_impl(map, end_posn, queue, visited)
@@ -75,36 +75,43 @@ defmodule AdventOfCode.Day20 do
 
   def bfs_impl(map, end_posn, queue, visited) do
     IO.puts("bfs_impl")
-    IO.inspect(end_posn)
+    IO.puts("queue")
     IO.inspect(queue)
+    IO.puts("visited")
     IO.inspect(visited)
     if :queue.is_empty(queue) do
       # no moves left
       # expected to read the end
       nil
     else
-      {{:value, {r, c, moves, path}}, queue} = :queue.out(queue)
-      if {r, c} == end_posn do
-        [{r,c, moves} | path]
+      {{:value, {r, c, numMoves, path}}, queue} = :queue.out(queue)
+      if {r, c} == end_posn do #or numMoves == 3 do
+        path
         |> Enum.reverse()
       else
         IO.puts("inspecting move")
+        IO.write("!Map.has_key?(map, {r,c}) ")
         IO.inspect(!Map.has_key?(map, {r,c}))
+        IO.write("<<Map.get(map, {r,c})>> ")
         IO.inspect(<<Map.get(map, {r,c})>>)
-        IO.inspect(moves)
-        IO.inspect(Map.get(map, {r,c}, 99999999999))
-        path = [{r,c, moves} | path]
-        visited = Map.put(visited, {r,c}, moves)
+        IO.write("numMoves ")
+        IO.inspect(numMoves)
+        IO.write("Map.get(visited, {r,c}, 99999999999) ")
+        IO.inspect(Map.get(visited, {r,c}, 99999999999))
+        visited = Map.put(visited, {r,c}, numMoves)
         moves = [
-          {r + 0, c + 1, moves + 1, path},
-          {r + 0, c - 1, moves + 1, path},
-          {r + 1, c + 0, moves + 1, path},
-          {r - 1, c + 0, moves + 1, path},
+          {r + 0, c + 1, numMoves + 1, [{r + 0, c + 1, numMoves + 1} | path]},
+          {r + 0, c - 1, numMoves + 1, [{r + 0, c - 1, numMoves + 1} | path]},
+          {r + 1, c + 0, numMoves + 1, [{r + 1, c + 0, numMoves + 1} | path]},
+          {r - 1, c + 0, numMoves + 1, [{r - 1, c + 0, numMoves + 1} | path]},
         ]
-        |> Enum.filter(fn {r,c,moves,_} ->
-          Map.has_key?(map, {r,c})
-          and (Map.get(map, {r,c}) == ?. or Map.get(map, {r,c}) == ?S)
-          and moves < Map.get(map, {r,c}, 99999999999)
+        |> Enum.filter(fn {newr,newc,newNumMoves,_} ->
+          Map.has_key?(map, {newr,newc})
+          and (Map.get(map, {newr,newc}) == ?.
+                or Map.get(map, {newr,newc}) == ?S
+                or Map.get(map, {newr,newc}) == ?E
+                )
+          and newNumMoves < Map.get(visited, {newr,newc}, 99999999999)
         end)
 
         queue = moves
