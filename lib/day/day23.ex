@@ -69,8 +69,58 @@ defmodule AdventOfCode.Day23 do
     |> Enum.map(fn {a,b} -> {a, b, start} end)
   end
 
-  def part2(_input) do
+  def part2(input) do
+    adjacency_set = input
+    |> String.split("\n")
+    |> Enum.map(&String.split(&1, "-"))
+    |> Enum.map(fn [a, b] ->
+      [
+        {a, b},
+        {b, a}
+      ]
+    end)
+    |> List.flatten()
+    |> Enum.reduce(MapSet.new(), fn ele, acc ->
+      MapSet.put(acc, ele)
+    end)
+
+    adjacency_map = adjacency_set
+    |> Enum.reduce(%{}, fn {k, v}, acc ->
+      Map.update(acc, k, [v], fn existing_values -> [v | existing_values] end)
+    end)
+
+    adjacency_map
+    |> Enum.map(fn {k,v} ->
+      {k, length(v)}
+    end)
+    |> IO.inspect()
+    |> Enum.map(fn {_,v} -> v end)
+    |> Enum.max()
+    |> IO.inspect()
+    # 13 is max number of connected computers, 13^2 not to bad
+
+    conn2 = adjacency_set
+    |> Enum.map(fn {a, b} ->
+      if a <= b do
+        {a, b}
+      else
+        {b, a}
+      end
+    end)
+    |> MapSet.new()
+    |> IO.inspect()
+
+    conn3 = expand_connected(adjacency_set, adjacency_map, conn2)
+    |> IO.inspect()
+
+    conn4 = expand_connected(adjacency_set, adjacency_map, conn2)
+    |> IO.inspect()
+
     0
+  end
+
+  def expand_connected(adjacency_set, adjacency_map, connected) do
+    connected
   end
 
 end
