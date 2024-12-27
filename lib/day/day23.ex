@@ -99,7 +99,7 @@ defmodule AdventOfCode.Day23 do
     |> IO.inspect()
     # 13 is max number of connected computers, 13^2 not to bad
 
-    conn2 = adjacency_set
+    conn = adjacency_set
     |> Enum.map(fn {a, b} ->
       if a <= b do
         {a, b}
@@ -110,17 +110,47 @@ defmodule AdventOfCode.Day23 do
     |> MapSet.new()
     |> IO.inspect()
 
-    conn3 = expand_connected(adjacency_set, adjacency_map, conn2)
-    |> IO.inspect()
-
-    conn4 = expand_connected(adjacency_set, adjacency_map, conn2)
-    |> IO.inspect()
+    3..13
+    |> Enum.reduce(conn, fn _, acc ->
+      expand_connecteds(adjacency_set, adjacency_map, acc)
+      |> IO.inspect()
+    end)
 
     0
   end
 
-  def expand_connected(adjacency_set, adjacency_map, connected) do
-    connected
+  def expand_connecteds(adjacency_set, adjacency_map, connecteds) do
+    connecteds
+    |> Enum.map(&expand_connected(&1, adjacency_set, adjacency_map))
+    |> List.flatten()
+    |> MapSet.new()
+  end
+
+  def expand_connected(connected, adjacency_set, adjacency_map) do
+    connected_list = Tuple.to_list(connected)
+
+    first = elem(connected, 0)
+
+    already_in = connected
+    |> Tuple.to_list()
+    |> MapSet.new()
+
+    Map.get(adjacency_map, first)
+    # already got them
+    |> Enum.filter(fn potential -> !MapSet.member?(already_in, potential) end)
+    |> Enum.filter(fn potential -> all_connected(potential, connected, adjacency_set) end)
+    |> Enum.map(fn potential -> [potential | connected_list] end)
+    |> Enum.map(fn potential -> Enum.sort(potential) end)
+    |> Enum.map(fn potential -> List.to_tuple(potential) end)
+    |> MapSet.new()
+    |> MapSet.to_list()
+  end
+
+  def all_connected(potential, already_connecteds, adjacency_set) do
+    already_connecteds
+    |> Tuple.to_list()
+    |> Enum.map(fn already_connected -> MapSet.member?(adjacency_set, {potential, already_connected}) end)
+    |> Enum.all?()
   end
 
 end
