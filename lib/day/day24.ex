@@ -15,7 +15,29 @@ defmodule AdventOfCode.Day24 do
     end
   end
 
-  def part1(_input) do
+  def part1(input) do
+    [initial_state, wire_connections] = input
+    |> String.split("\n\n")
+
+    initial_state = initial_state
+    |> String.split("\n")
+    |> Enum.map(&String.split(&1, ": "))
+    |> Enum.map(fn [a, b] -> {
+      a,
+      if b == "1" do
+        true
+      else
+        false
+      end}
+    end)
+    |> IO.inspect()
+
+    wire_connections = wire_connections
+    |> String.split("\n")
+    |> Enum.map(&String.split(&1, " "))
+    |> Enum.map(fn [a, op, b, _, destination] -> {a,op,b,destination} end)
+    |> IO.inspect()
+
     0
   end
 
