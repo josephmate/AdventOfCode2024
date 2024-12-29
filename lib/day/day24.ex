@@ -38,6 +38,26 @@ defmodule AdventOfCode.Day24 do
     |> Enum.map(fn [a, op, b, _, destination] -> {a,op,b,destination} end)
     |> IO.inspect()
 
+    var_to_input_lookup = wire_connections
+    |> Enum.map(fn {a,op,b,destination} ->
+      [
+        {a, {a,op,b,destination}},
+        {b, {a,op,b,destination}}
+      ]
+    end)
+    |> List.flatten()
+    |> Enum.group_by(
+      fn {k, _} -> k end,
+      fn {_, v} -> v end
+    )
+    |> IO.inspect()
+
+    end_state = solve_eqn(initial_state, var_to_input_lookup)
+
+    0
+  end
+
+  defp solve_eqn(initial_state, var_to_input_lookup) do
     0
   end
 
