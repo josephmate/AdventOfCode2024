@@ -48,24 +48,29 @@ defmodule AdventOfCode.Day19 do
   end
 
   defp count_ways(components, target) do
-    count_ways_impl(components, target, 0)
+    count_ways_impl(components, target, 0, %{})
+    |> elem(0)
     |> IO.inspect()
   end
 
-  defp count_ways_impl(components, target, idx) do
+  defp count_ways_impl(components, target, idx, memo) do
     if idx == String.length(target) do
-      1
+      {1, Map.put(memo, idx, 1)}
     else
-      components
-      |> Enum.filter(fn component ->
-        target
-        |> String.slice(idx..String.length(target)-1)
-        |> String.starts_with?(component)
-      end)
-      |> Enum.map(fn component ->
-        count_ways_impl(components, target, idx + String.length(component))
-      end)
-      |> Enum.sum()
+      if Map.has_key?(memo, idx) do
+        {Map.get(memo, idx), memo}
+      else
+        components
+        |> Enum.filter(fn component ->
+          target
+          |> String.slice(idx..String.length(target)-1)
+          |> String.starts_with?(component)
+        end)
+        |> Enum.reduce({0, memo}, fn component, {sum_acc, memo_acc} ->
+          {partial_sum, memo_acc} = count_ways_impl(components, target, idx + String.length(component), memo_acc)
+          {sum_acc + partial_sum, memo_acc}
+        end)
+      end
     end
   end
 
