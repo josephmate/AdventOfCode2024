@@ -34,8 +34,39 @@ defmodule AdventOfCode.Day19 do
     |> Enum.count()
   end
 
-  def part2(_input) do
-    0
+  def part2(input) do
+    [components, targets] = input
+    |> String.split("\n\n")
+
+    components = components
+    |> String.split(", ")
+
+    targets
+    |> String.split("\n")
+    |> Enum.map(fn target -> count_ways(components, target) end)
+    |> Enum.sum()
+  end
+
+  defp count_ways(components, target) do
+    count_ways_impl(components, target, 0)
+    |> IO.inspect()
+  end
+
+  defp count_ways_impl(components, target, idx) do
+    if idx == String.length(target) do
+      1
+    else
+      components
+      |> Enum.filter(fn component ->
+        target
+        |> String.slice(idx..String.length(target)-1)
+        |> String.starts_with?(component)
+      end)
+      |> Enum.map(fn component ->
+        count_ways_impl(components, target, idx + String.length(component))
+      end)
+      |> Enum.sum()
+    end
   end
 
 end
