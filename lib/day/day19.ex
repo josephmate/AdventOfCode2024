@@ -15,8 +15,23 @@ defmodule AdventOfCode.Day19 do
     end
   end
 
-  def part1(_input) do
-    0
+  def part1(input) do
+    [components, targets] = input
+    |> String.split("\n\n")
+
+    components = components
+    |> String.split(", ")
+    |> Enum.join("|")
+    {:ok, components} = "^(" <> components <> ")+$"
+    |> IO.inspect()
+    |> Regex.compile()
+
+    targets
+    |> String.split("\n")
+    |> Enum.filter(fn target ->
+      Regex.match?(components, target)
+    end)
+    |> Enum.count()
   end
 
   def part2(_input) do
