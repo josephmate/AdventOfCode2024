@@ -11,7 +11,8 @@ defmodule AdventOfCode.Day19 do
     def sample_part2_files(value) do
       %{
         "day#{value.day}_sample.txt" => "day#{value.day}_sample_part2_result.txt",
-        "day#{value.day}_sample_02.txt" => "day#{value.day}_sample_02_part1_result.txt"
+        "day#{value.day}_sample_02.txt" => "day#{value.day}_sample_02_part2_result.txt",
+        "day#{value.day}_sample_03.txt" => "day#{value.day}_sample_03_part2_result.txt"
       }
     end
   end
@@ -62,12 +63,52 @@ defmodule AdventOfCode.Day19 do
   #       r 3
   #         r 4 *
   #       rr 4 *
-  # rrrrr
+  # 8 rrrrr
   #   r 1
   #     r 2
+  #       r 3
+  #         r 4
+  #           r 5 *
+  #         rr 5 *
+  #       rr 4
+  #         r 5 *
   #     rr 3
+  #       r 4
+  #         r 5 *
+  #       rr 5 *
   #   rr 2
-
+  #     r 3
+  #       r 4
+  #         r 5 *
+  #       rr 5 *
+  #     rr 4
+  #       r 5 *
+  #
+  # a, b, ab, ba
+  # 1 a
+  # 2 ab
+  #   a 1
+  #     b 2 *
+  #   ab 2 *
+  # 3 aba
+  #   a 1
+  #     b 2
+  #       a 3 *
+  #     ba 3 *
+  #   ab 2
+  #     a 3 *
+  # 5 abab
+  #   a 1
+  #     b 2
+  #       a 3
+  #         b 4 *
+  #       ab 4 *
+  #     ba 3
+  #       b 4 *
+  #   ab 2
+  #     a 3
+  #       b 4 *
+  #     ab 4 *
   def part2(input) do
     [components, targets] = input
     |> String.split("\n\n")
