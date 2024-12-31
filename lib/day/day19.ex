@@ -45,6 +45,8 @@ defmodule AdventOfCode.Day19 do
     |> String.split("\n")
     |> Enum.map(fn target -> count_ways(components, target) end)
     |> Enum.sum()
+    # got 919219286602166 but was too high
+    # more debugging needed
   end
 
   defp count_ways(components, target) do
@@ -60,7 +62,7 @@ defmodule AdventOfCode.Day19 do
       if Map.has_key?(memo, idx) do
         {Map.get(memo, idx), memo}
       else
-        components
+        {new_sum, new_memo} = components
         |> Enum.filter(fn component ->
           target
           |> String.slice(idx..String.length(target)-1)
@@ -70,6 +72,9 @@ defmodule AdventOfCode.Day19 do
           {partial_sum, memo_acc} = count_ways_impl(components, target, idx + String.length(component), memo_acc)
           {sum_acc + partial_sum, memo_acc}
         end)
+
+        new_memo = Map.put(new_memo, idx, new_sum)
+        {new_sum, new_memo}
       end
     end
   end

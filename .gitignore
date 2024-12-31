@@ -1,3 +1,7 @@
+*.swp
+
+advent_of_code_2024
+
 /_build
 /cover
 /deps
