@@ -116,12 +116,22 @@ defmodule AdventOfCode.Day19 do
     components = components
     |> String.split(", ")
 
+    # check if input has any duplicates
+    components
+    |> Enum.group_by(fn v -> v end)
+    |> Enum.map(fn {k, v} -> {k, length(v)} end)
+    |> Enum.filter(fn {_,v} -> v >= 2 end)
+    |> IO.inspect()
+    # output was [], so it did not
+
     targets
     |> String.split("\n")
     |> Enum.map(fn target -> count_ways(components, target) end)
     |> Enum.sum()
     # got 919219286602166 but was too high
     # more debugging needed
+    # ran it again and got one less this time??????
+    # what happened. i didn't change anything other than switch computers
   end
 
   defp count_ways(components, target) do
